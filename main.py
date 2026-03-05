@@ -1,11 +1,9 @@
 import os
 import logging
 import threading
-import asyncio
 
 import requests as http_requests
 from flask import Flask, jsonify
-from pyrogram import idle
 
 from config import BOT_TOKEN
 from Extractor import app as pyrogram_app
@@ -50,25 +48,16 @@ def delete_webhook():
         LOGGER.error(f"Failed to delete webhook: {e}")
 
 
-async def start_bot():
-    """Start the Pyrogram bot client via MTProto polling."""
+if __name__ == "__main__":
     # Delete any leftover webhook from previous deployments
     delete_webhook()
 
-    await pyrogram_app.start()
-    me = await pyrogram_app.get_me()
-    LOGGER.info(f"Bot @{me.username} started successfully via MTProto polling!")
-    await idle()
-    await pyrogram_app.stop()
-
-
-if __name__ == "__main__":
     # Start Flask in a daemon thread for Render health checks
     flask_thread = threading.Thread(target=run_flask, daemon=True)
     flask_thread.start()
     LOGGER.info("Flask health-check server started")
 
-    # Run the Pyrogram bot in the main thread
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(start_bot())
+    # Run the Pyrogram bot using its built-in run() method
+    # This properly handles event loop, signals, and cleanup
+    LOGGER.info("Starting Pyrogram bot...")
+    pyrogram_app.run()
