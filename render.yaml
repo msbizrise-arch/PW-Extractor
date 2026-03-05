@@ -3,16 +3,16 @@ services:
   - type: web
     name: pw-extractor
     runtime: python
-    repo: https://github.com/msbizrise-arch/PW-Extractor.git   # apna repo daal dena
+    repo: https://github.com/msbizrise-arch/PW-Extractor.git
     branch: main
     rootDir: .
     buildCommand: pip install -r requirements.txt
-    startCommand: bash start.sh
+    startCommand: python main.py
     envVars:
       - key: PYTHON_VERSION
-        value: 3.12.1                    # ← Yeh line sabse powerful hai
+        value: 3.12.1
       - key: PORT
-        value: 8080
+        value: 10000
       - key: API_ID
         sync: false
       - key: API_HASH
