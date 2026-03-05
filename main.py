@@ -1,43 +1,50 @@
 import os
-import asyncio
 import threading
-import importlib
 import logging
-from logging.handlers import RotatingFileHandler
-
+from flask import Flask, jsonify
 from pyrogram import Client, idle
 from config import API_ID, API_HASH, BOT_TOKEN
 from Extractor.modules import ALL_MODULES
+import importlib
 
+# Logging setup
 logging.basicConfig(
     level=logging.INFO,
     format="%(name)s - %(message)s",
-    handlers=[
-        RotatingFileHandler("log.txt", maxBytes=5000000, backupCount=10),
-        logging.StreamHandler()
-    ]
+    handlers=[logging.StreamHandler()]
 )
-
 LOGGER = logging.getLogger(__name__)
 
-async def boot():
-    for module in ALL_MODULES:
-        importlib.import_module("Extractor.modules." + module)
-    LOGGER.info("» PW EXTRACTOR BOT STARTED SUCCESSFULLY 🚀")
-    await idle()
+# Flask app for Render healthcheck
+flask_app = Flask(__name__)
 
-def run_web():
-    from fastapi import FastAPI
-    import uvicorn
-    app = FastAPI()
-    @app.get("/")
-    async def home(): return {"status": "PW-Extractor Online"}
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8080)), loop="asyncio")
+@flask_app.route("/", methods=["GET"])
+def health_check():
+    return jsonify({"status": "PW-Extractor Online and Running"})
+
+# Load all modules (handlers register automatically)
+for module in ALL_MODULES:
+    importlib.import_module(f"Extractor.modules.{module}")
+
+# Bot startup function (run in background thread)
+def start_bot():
+    client = Client(
+        "PWExtractor",
+        api_id=API_ID,
+        api_hash=API_HASH,
+        bot_token=BOT_TOKEN
+    )
+    
+    client.start()
+    LOGGER.info("» PW EXTRACTOR BOT STARTED SUCCESSFULLY 🚀")
+    idle()  # Keeps the bot polling forever
+    client.stop()
 
 if __name__ == "__main__":
-    threading.Thread(target=run_web, daemon=True).start()
+    # Start bot polling in a background thread
+    bot_thread = threading.Thread(target=start_bot, daemon=True)
+    bot_thread.start()
     
-    # Clean event loop for Render + Python 3.12
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(boot())
+    # Run Flask server (Render requires this for web service)
+    port = int(os.getenv("PORT", 10000))  # Render uses $PORT, default fallback
+    flask_app.run(host="0.0.0.0", port=port, debug=False)
