@@ -4,7 +4,6 @@ motor
 requests
 pytz
 python-dotenv
-fastapi
-uvicorn==0.30.6          # pinned (stable + no loop_factory error)
+flask
 gunicorn==20.1.0
 aiofiles
