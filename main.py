@@ -5,10 +5,6 @@ import importlib
 import logging
 from logging.handlers import RotatingFileHandler
 
-# 🔥 PRO FIX - Render + Python 3.12/3.14 event loop crash khatam
-import nest_asyncio
-nest_asyncio.apply()          # ← Yeh line sabse pehle
-
 from pyrogram import Client, idle
 from config import API_ID, API_HASH, BOT_TOKEN
 from Extractor.modules import ALL_MODULES
@@ -36,8 +32,12 @@ def run_web():
     app = FastAPI()
     @app.get("/")
     async def home(): return {"status": "PW-Extractor Online"}
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8080)))
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8080)), loop="asyncio")
 
 if __name__ == "__main__":
     threading.Thread(target=run_web, daemon=True).start()
-    asyncio.run(boot())
+    
+    # Clean event loop for Render + Python 3.12
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(boot())
