@@ -1,0 +1,32 @@
+version: 1
+services:
+  - type: web
+    name: pw-extractor
+    runtime: python
+    repo: https://github.com/msbizrise-arch/PW-Extractor.git
+    branch: main
+    rootDir: .
+    pythonVersion: 3.12.1          # ← Yeh line Python version LOCK kar degi
+    buildCommand: pip install -r requirements.txt
+    startCommand: bash start.sh
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: API_ID
+        sync: false
+      - key: API_HASH
+        sync: false
+      - key: BOT_TOKEN
+        sync: false
+      - key: OWNER_ID
+        sync: false
+      - key: SUDO_USERS
+        sync: false
+      - key: MONGO_URL
+        sync: false
+      - key: CHANNEL_ID
+        sync: false
+      - key: PREMIUM_LOGS
+        sync: false
+    autoDeploy: true
+    plan: free                    # free tier ke liye (agar paid chahiye toh change kar dena)
