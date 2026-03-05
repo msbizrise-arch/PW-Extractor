@@ -8,3 +8,4 @@ fastapi
 uvicorn[standard]
 gunicorn==20.1.0
 aiofiles
+nest_asyncio          # ← Yeh line sabse important (event loop fix)
