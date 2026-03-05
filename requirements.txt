@@ -5,7 +5,6 @@ requests
 pytz
 python-dotenv
 fastapi
-uvicorn[standard]
+uvicorn==0.30.6          # pinned (stable + no loop_factory error)
 gunicorn==20.1.0
 aiofiles
-nest_asyncio          # ← Yeh line sabse important (event loop fix)
