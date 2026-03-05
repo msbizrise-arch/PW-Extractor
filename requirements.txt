@@ -1,5 +1,5 @@
-pyrogram==2.1.0
-TgCrypto
+pyrogram==2.0.106
+tgcrypto
 motor
 requests
 pytz
