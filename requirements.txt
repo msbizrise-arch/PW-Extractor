@@ -1,0 +1,10 @@
+pyrogram==2.1.0
+TgCrypto
+motor
+requests
+pytz
+python-dotenv
+fastapi
+uvicorn[standard]
+gunicorn==20.1.0
+aiofiles
